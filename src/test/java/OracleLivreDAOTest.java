@@ -6,13 +6,18 @@ import org.example.dao.LivreDAO;
 import org.example.dao.impl.OracleDAOFactory;
 import org.example.pojo.*;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import static java.sql.Types.INTEGER;
 
 public class OracleLivreDAOTest extends TestCase{
     DAOFactory daoFactory;
     LivreDAO livreDao;
     Livre l;
     Exemplaire e1, e2;
+    Connection c;
 
     @Override
     protected void setUp() throws Exception{
@@ -30,7 +35,14 @@ public class OracleLivreDAOTest extends TestCase{
         e2.setPrix(100.0);
         e2.setDulivre(l);
         l.addExemplaire(e2);
+        c = daoFactory.getConnection();
     }
+
+    @Override
+    protected void tearDown(){
+
+    }
+
 
     public void testInsertLivre(){
         assertTrue(livreDao.insertLivre(l));
@@ -56,5 +68,21 @@ public class OracleLivreDAOTest extends TestCase{
 
     public static Test suite(){
         return new TestSuite(OracleLivreDAOTest.class);
+    }
+
+
+    /**
+     * fonctions pour remettre la bd dans un état avant les tests
+     */
+    private void insertLivreForTest(){
+        try {
+            PreparedStatement cmdUpdate = c.prepareStatement("INSERT INTO LIVRE(ISBN, TITRE) VALUES(?, ?)");
+            cmdUpdate.setInt(1, l.getIsbn());
+            cmdUpdate.setString(2, l.getTitre());
+            assertEquals(1, cmdUpdate.executeUpdate());
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
 }
