@@ -25,22 +25,24 @@ public class OracleExemplaireDAO implements ExemplaireDAO {
     @Override
     public Boolean insertExemplaire(Exemplaire e) {
         try {
-            PreparedStatement cmdUpdate = this.c.prepareStatement("INSERT INTO EXEMPLAIRE(ID, PRIX, DULIVRE, EMPRUNTEUR) VALUES(?, ?, ?, ?)");
-            cmdUpdate.setInt(1, e.getId());
+            PreparedStatement cmdUpdate = this.c.prepareStatement("INSERT INTO EXEMPLAIRE(ID, PRIX, DULIVRE, EMPRUNTEUR) VALUES(SEQ_Exemplaire.nextval, ?, ?, ?)");
+            //cmdUpdate.setInt(1, e.getId());
+
+            //on verifie chaque attribut pour bien remplir la requete
             if (e.getPrix() == null){
-                cmdUpdate.setNull(2, DOUBLE);
+                cmdUpdate.setNull(1, DOUBLE);
             } else {
-                cmdUpdate.setDouble(2, e.getPrix());
+                cmdUpdate.setDouble(1, e.getPrix());
             }
             if (e.getDulivre() == null) {
-                cmdUpdate.setNull(3, INTEGER);
+                cmdUpdate.setNull(2, INTEGER);
             } else {
-                cmdUpdate.setInt(3, e.getDulivre().getIsbn());
+                cmdUpdate.setInt(2, e.getDulivre().getIsbn());
             }
             if (e.getEmprunteur() == null){
-                cmdUpdate.setNull(4, INTEGER);
+                cmdUpdate.setNull(3, INTEGER);
             } else {
-                cmdUpdate.setInt(4, e.getEmprunteur().getId());
+                cmdUpdate.setInt(3, e.getEmprunteur().getId());
             }
             int res = cmdUpdate.executeUpdate();
             return res == 1;

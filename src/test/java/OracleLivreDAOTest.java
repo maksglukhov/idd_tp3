@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static java.sql.Types.INTEGER;
 
 public class OracleLivreDAOTest extends TestCase{
     DAOFactory daoFactory;
@@ -46,16 +45,20 @@ public class OracleLivreDAOTest extends TestCase{
 
     public void testInsertLivre(){
         assertTrue(livreDao.insertLivre(l));
+        deleteLivreForTest(l);
     }
 
     public void testUpdateLivre(){
+        insertLivreForTest(l); // on insere une livre avant faire update
         l.setTitre("new toto");
         l.getExemplaireList().get(0).setPrix(90.0);
         l.removeExemplaire(e2);
-        assertTrue(livreDao.updateLivre(l));
+        assertTrue(livreDao.updateLivre(l)); // on fait update
+        deleteLivreForTest(l); // on supprime livre après le test
     }
 
     public void testDeleteLivre(){
+        insertLivreForTest(l);
         assertTrue(livreDao.deleteLivre(l));
     }
 
@@ -72,9 +75,9 @@ public class OracleLivreDAOTest extends TestCase{
 
 
     /**
-     * fonctions pour remettre la bd dans un état avant les tests
+     * fonctions pour préprarer la bd pour les tests et remettre dans l'etat intial après
      */
-    private void insertLivreForTest(){
+    private void insertLivreForTest(Livre l){
         try {
             PreparedStatement cmdUpdate = c.prepareStatement("INSERT INTO LIVRE(ISBN, TITRE) VALUES(?, ?)");
             cmdUpdate.setInt(1, l.getIsbn());
@@ -84,5 +87,28 @@ public class OracleLivreDAOTest extends TestCase{
             throw new RuntimeException(ex);
         }
 
+    }
+
+    private void deleteLivreForTest(Livre l){
+        deleteExemplaireAfterTest(l); // il faut supprimer les exemplaires si il en existe
+        try {
+            PreparedStatement cmdUpdate = c.prepareStatement("DELETE FROM LIVRE WHERE ISBN = ?");
+            cmdUpdate.setInt(1, l.getIsbn());
+            assertEquals(1, cmdUpdate.executeUpdate());
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+
+    }
+
+    private void deleteExemplaireAfterTest(Livre l){
+        int size = l.getExemplaireList().size();
+        try {
+            PreparedStatement cmdUpdate = c.prepareStatement("DELETE FROM EXEMPLAIRE WHERE DULIVRE = ?");
+            cmdUpdate.setInt(1, l.getIsbn());
+            assertEquals(size, cmdUpdate.executeUpdate());
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
