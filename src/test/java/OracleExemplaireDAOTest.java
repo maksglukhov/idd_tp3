@@ -8,6 +8,7 @@ import org.example.pojo.Personne;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -26,39 +27,37 @@ public class OracleExemplaireDAOTest extends TestCase {
         super.setUp();
         daoFactory = new OracleDAOFactory();
         exemplaireDAO = daoFactory.getExemplaireDAO();
-        e = new Exemplaire();
-        e.setId(77);
-        e.setPrix(7.7);
         l = new Livre(1, "La Terre entre nos mains");
+        c = daoFactory.getConnection();
+        e = new Exemplaire();
+        e.setId(exemplaireDAO.getNewIdExemplaire());
+        e.setPrix(7.7);
         e.setDulivre(l);
         e.setEmprunteur(null);
         l.setExemplaireList(new ArrayList<>());
-        c = daoFactory.getConnection();
+        l.addExemplaire(e);
     }
 
     @Override
     protected void tearDown(){
-        deleteExemplaireAfterTest(e);
+
     }
 
     public void testInsertExemplaire(){
-        l.addExemplaire(e);
         assertTrue(exemplaireDAO.insertExemplaire(e));
+        deleteExemplaireAfterTest(e);
     }
 
 
     public void testUpdateExemplaire(){
         Exemplaire eCopy = e;
         insertExemplaireForTest(e);
-        l.removeExemplaire(e);
         e.setPrix(10.10);
-        l.addExemplaire(e);
         assertTrue(exemplaireDAO.updateExemplaire(e));
-
+        deleteExemplaireAfterTest(e);
     }
 
     public void testDeleteExemplaire(){
-        l.removeExemplaire(e);
         insertExemplaireForTest(e);
         assertTrue(exemplaireDAO.deleteExemplaire(e));
     }
@@ -81,8 +80,9 @@ public class OracleExemplaireDAOTest extends TestCase {
     }
 
     private void deleteExemplaireAfterTest(Exemplaire e) {
+        System.out.println("id exemplaire " + e.getId());
         try {
-            PreparedStatement cmdUpdate = c.prepareStatement("DELETE FROM EXEMPLAIRE WHERE ID = ?");
+            PreparedStatement cmdUpdate = c.prepareStatement("DELETE FROM EXEMPLAIRE WHERE ID = ?"); //TODO ajouter currval de livre à la place de 16
             cmdUpdate.setInt(1, e.getId());
             assertEquals(1, cmdUpdate.executeUpdate());
         } catch (SQLException ex) {

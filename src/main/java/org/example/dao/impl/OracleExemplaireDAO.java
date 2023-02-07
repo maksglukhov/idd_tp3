@@ -25,24 +25,25 @@ public class OracleExemplaireDAO implements ExemplaireDAO {
     @Override
     public Boolean insertExemplaire(Exemplaire e) {
         try {
-            PreparedStatement cmdUpdate = this.c.prepareStatement("INSERT INTO EXEMPLAIRE(ID, PRIX, DULIVRE, EMPRUNTEUR) VALUES(SEQ_Exemplaire.nextval, ?, ?, ?)");
+            PreparedStatement cmdUpdate = this.c.prepareStatement("INSERT INTO EXEMPLAIRE(ID, PRIX, DULIVRE, EMPRUNTEUR) VALUES(?, ?, ?, ?)");
             //cmdUpdate.setInt(1, e.getId());
+            cmdUpdate.setInt(1, e.getId());
 
             //on verifie chaque attribut pour bien remplir la requete
             if (e.getPrix() == null){
-                cmdUpdate.setNull(1, DOUBLE);
+                cmdUpdate.setNull(2, DOUBLE);
             } else {
-                cmdUpdate.setDouble(1, e.getPrix());
+                cmdUpdate.setDouble(2, e.getPrix());
             }
             if (e.getDulivre() == null) {
-                cmdUpdate.setNull(2, INTEGER);
-            } else {
-                cmdUpdate.setInt(2, e.getDulivre().getIsbn());
-            }
-            if (e.getEmprunteur() == null){
                 cmdUpdate.setNull(3, INTEGER);
             } else {
-                cmdUpdate.setInt(3, e.getEmprunteur().getId());
+                cmdUpdate.setInt(3, e.getDulivre().getIsbn());
+            }
+            if (e.getEmprunteur() == null){
+                cmdUpdate.setNull(4, INTEGER);
+            } else {
+                cmdUpdate.setInt(4, e.getEmprunteur().getId());
             }
             int res = cmdUpdate.executeUpdate();
             return res == 1;
@@ -118,6 +119,21 @@ public class OracleExemplaireDAO implements ExemplaireDAO {
                 l.addExemplaire(new Exemplaire(resultSet.getInt("ID"), resultSet.getDouble("PRIX"), l, null));
             }
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int getNewIdExemplaire(){
+        int id = 0;
+        try{
+            PreparedStatement stm = this.c.prepareStatement("SELECT SEQ_Exemplaire.nextval FROM DUAL");
+            ResultSet res = stm.executeQuery();
+            while(res.next()){
+                id = res.getInt(1);
+            }
+            return id;
+        } catch (SQLException e){
             throw new RuntimeException(e);
         }
     }

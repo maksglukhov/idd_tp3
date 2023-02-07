@@ -10,4 +10,6 @@ public interface ExemplaireDAO {
     Boolean deleteExemplaireByIdLivre(Livre l);
 
     void loadExemplaires(Livre l);
+
+    int getNewIdExemplaire();
 }
