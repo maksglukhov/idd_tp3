@@ -1,4 +1,6 @@
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.example.dao.DAOFactory;
 import org.example.dao.ExemplaireDAO;
 import org.example.dao.impl.OracleDAOFactory;
@@ -11,6 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static java.sql.Types.INTEGER;
 
@@ -62,6 +66,18 @@ public class OracleExemplaireDAOTest extends TestCase {
         assertTrue(exemplaireDAO.deleteExemplaire(e));
     }
 
+    public void testFindExemplaires(){
+        Livre l = new Livre(1, "La Terre entre nos mains");
+        e.setDulivre(l);
+        Exemplaire newE = new Exemplaire();
+        newE.setPrix(26.5);
+        List<Exemplaire> exemplaireList = exemplaireDAO.findExemplaires(newE);
+        assertEquals(5, exemplaireList.size());
+        for (Exemplaire exemplaire: exemplaireList){
+            assertEquals(26.5, exemplaire.getPrix());
+        }
+    }
+
 
     /**
      * fonctions pour remettre la bd dans un état avant les tests
@@ -80,7 +96,6 @@ public class OracleExemplaireDAOTest extends TestCase {
     }
 
     private void deleteExemplaireAfterTest(Exemplaire e) {
-        System.out.println("id exemplaire " + e.getId());
         try {
             PreparedStatement cmdUpdate = c.prepareStatement("DELETE FROM EXEMPLAIRE WHERE ID = ?"); //TODO ajouter currval de livre à la place de 16
             cmdUpdate.setInt(1, e.getId());
@@ -88,5 +103,9 @@ public class OracleExemplaireDAOTest extends TestCase {
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static Test suite() {
+        return new TestSuite(OracleExemplaireDAOTest.class);
     }
 }

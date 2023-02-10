@@ -9,6 +9,7 @@ import org.example.pojo.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 
 public class OracleLivreDAOTest extends TestCase{
@@ -69,10 +70,25 @@ public class OracleLivreDAOTest extends TestCase{
         assertEquals(5 , l.getExemplaireList().size());
     }
 
+    public void testFindLivres(){
+        Livre l = new Livre();
+        l.setTitre("le hussard");
+        List<Livre> livreList = livreDao.findLivres(l);
+        //on sait qu'il y a 4 livre avec ce titre parce que le script a été executé juste avant les tests
+        assertEquals(4, livreList.size());
+        for (Livre livre :livreList){
+            assertEquals("le hussard", livre.getTitre());
+        }
+    }
+
+    public void testFindLivresComplexe(){
+        List<Livre> livreList = livreDao.findLivresComplexe("TITRE", "like", "ss");
+        assertEquals(5, livreList.size());
+    }
+
     public static Test suite(){
         return new TestSuite(OracleLivreDAOTest.class);
     }
-
 
     /**
      * fonctions pour préprarer la bd pour les tests et remettre dans l'etat intial après

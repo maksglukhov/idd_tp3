@@ -7,6 +7,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+
+/**
+ * fourni les méthodes CRUD pour des personnes (emprunteurs)
+ * @author GLUKHOV Maks
+ */
 public class OraclePersonneDAO implements PersonneDAO {
 
     OracleDAOFactory oracleDAOFactory;
@@ -17,6 +22,11 @@ public class OraclePersonneDAO implements PersonneDAO {
         this.c = oracleDAOFactory.getConnection();
     }
 
+    /**
+     * insére une personne dans la bd
+     * @param p objet de la classe Personne
+     * @return boolean pour savoir si tout s'est bien passé
+     */
     @Override
     public Boolean insertPersonne(Personne p) {
         try{
@@ -31,6 +41,11 @@ public class OraclePersonneDAO implements PersonneDAO {
         }
     }
 
+    /**
+     * update d'une personne dans la bd
+     * @param p objet de la classe Personne
+     * @return boolean pour savoir si tout s'est bien passé
+     */
     @Override
     public Boolean updatePersonne(Personne p) {
         try{
@@ -45,6 +60,11 @@ public class OraclePersonneDAO implements PersonneDAO {
         }
     }
 
+    /**
+     * supprime une personne de la bd
+     * @param p objet de la classe Personne
+     * @return boolean pour savoir si tout s'est bien passé
+     */
     @Override
     public Boolean deletePersonne(Personne p) {
         try{

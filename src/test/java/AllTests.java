@@ -10,6 +10,7 @@ public class AllTests extends TestSuite {
         suite.addTest(PersonneTest.suite());
 		suite.addTest(OracleLivreDAOTest.suite());
 		suite.addTest(OraclePersonneDAOTest.suite());
+		suite.addTest(OracleExemplaireDAOTest.suite());
 	    return suite;
 	  }
 

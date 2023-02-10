@@ -12,4 +12,6 @@ public interface DAOFactory {
     ExemplaireDAO getExemplaireDAO();
 
     Connection getConnection();
+
+    void executeNativeQuery(String requeteSQL);
 }
